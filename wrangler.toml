@@ -1,5 +1,6 @@
-# Cloudflare Pages: GitHub에 푸시한 뒤 Dashboard에서 이 저장소를 연결하거나,
-# GitHub Actions의 wrangler pages deploy로 배포합니다.
-name = "oneul-cafe"
-compatibility_date = "2026-09-27"
-pages_build_output_dir = "out"
+# Next.js static export를 Cloudflare Workers Static Assets로 배포합니다.
+name = "todaycafe"
+compatibility_date = "2026-09-28"
+
+[assets]
+directory = "./out"

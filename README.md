@@ -19,21 +19,15 @@ npm install
 npm run dev
 ```
 
-## GitHub + Cloudflare Pages
+## GitHub + Cloudflare Workers
 
-이 프로젝트는 Next.js static export(`out/`)라서 Cloudflare Pages와 잘 맞습니다.
+이 프로젝트는 Next.js static export 결과물인 `out/`을 Cloudflare Workers Static Assets로 배포합니다.
 
 1. GitHub에 저장소를 만들고 이 폴더를 푸시합니다.
-2. [Cloudflare Dashboard](https://dash.cloudflare.com) → Workers & Pages → Import repository
-3. Framework preset: **Next.js (Static HTML Export)**
+2. [Cloudflare Dashboard](https://dash.cloudflare.com) → Workers & Pages에서 저장소를 연결합니다.
+3. 아래 빌드 설정을 사용합니다.
    - Build command: `npm run build`
-   - Build output directory: `out`
-   - Production branch: `main`
-
-또는 GitHub Actions를 쓰려면 저장소 Secrets에 다음을 넣습니다.
-
-- `CLOUDFLARE_API_TOKEN` (Account - Cloudflare Pages - Edit)
-- `CLOUDFLARE_ACCOUNT_ID`
+   - Deploy command: `npx wrangler deploy`
 
 로컬에서 한 번 올려 보려면:
 

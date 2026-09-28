@@ -7,7 +7,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "cf:deploy": "npm run build && wrangler pages deploy out --project-name=oneul-cafe"
+    "cf:deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "next": "16.3.4",
