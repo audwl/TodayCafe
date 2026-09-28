@@ -10,6 +10,13 @@ export default function HeroSection({
   return (
     <section className="px-4 pb-8 pt-10 sm:px-6 sm:pt-14">
       <div className="mx-auto max-w-5xl text-center">
+        <div className="mx-auto mb-6 flex max-w-xl items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-left text-sm text-amber-950">
+          <span aria-hidden="true">🚧</span>
+          <p>
+            <strong className="font-semibold">공개 베타</strong>
+            <span className="text-amber-800"> · 현재 카페와 상태 정보는 서비스 체험용 샘플입니다.</span>
+          </p>
+        </div>
         <h1 className="text-3xl font-bold leading-tight tracking-tight text-stone-800 sm:text-4xl">
           지금 어디 카페 갈까?
         </h1>

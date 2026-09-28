@@ -20,8 +20,8 @@ export default function SuggestPage() {
         동네 카페 알려주기
       </h1>
       <p className="mt-3 text-stone-500">
-        아직 없는 카페를 알려주시면, 다음 버전에 목록에 넣을 수 있어요. 지금은 화면에만
-        남겨 두고 저장하지는 않습니다.
+        실제 카페 제보 기능을 준비하고 있습니다. 지금은 입력 흐름을 미리 체험할 수 있으며,
+        작성한 내용은 저장되지 않습니다.
       </p>
 
       <form
@@ -59,7 +59,7 @@ export default function SuggestPage() {
           type="submit"
           className="w-full rounded-xl bg-amber-800 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-900"
         >
-          제보 보내기
+          제보 화면 체험하기
         </button>
       </form>
 

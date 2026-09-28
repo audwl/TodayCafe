@@ -31,9 +31,14 @@ export default function CafeCard({ cafe, onReportStatus }: CafeCardProps) {
           </div>
           <p className="mt-0.5 text-sm text-stone-500">{cafe.neighborhood}</p>
         </div>
-        <span className="shrink-0 rounded-full bg-stone-100 px-2.5 py-1 text-xs text-stone-500">
-          {formatLastUpdated(cafe.lastUpdatedMinutes)}
-        </span>
+        <div className="flex shrink-0 flex-col items-end gap-1.5">
+          <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800">
+            샘플 정보
+          </span>
+          <span className="text-xs text-stone-400">
+            예시 · {formatLastUpdated(cafe.lastUpdatedMinutes)}
+          </span>
+        </div>
       </div>
 
       <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
@@ -70,7 +75,7 @@ export default function CafeCard({ cafe, onReportStatus }: CafeCardProps) {
         onClick={() => onReportStatus(cafe)}
         className="mt-5 w-full rounded-xl bg-stone-50 py-2.5 text-sm font-medium text-amber-900 transition-colors hover:bg-amber-50"
       >
-        지금 상태 알려주기
+        상태 공유 체험하기
       </button>
     </article>
   );

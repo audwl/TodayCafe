@@ -94,10 +94,10 @@ export default function Header() {
             <div className="mb-4 flex items-start justify-between gap-3">
               <div>
                 <h2 id="login-modal-title" className="text-lg font-bold text-stone-800">
-                  지금은 로그인 없이 써도 돼요
+                  공개 베타는 로그인 없이 둘러볼 수 있어요
                 </h2>
                 <p className="mt-1 text-sm text-stone-500">
-                  동네 카페 상태를 빠르게 나누는 서비스라서, 계정 없이도 확인·공유가 가능합니다.
+                  현재는 샘플 데이터로 검색과 상태 공유 흐름을 체험하는 단계입니다.
                 </p>
               </div>
               <button
@@ -111,12 +111,12 @@ export default function Header() {
             </div>
 
             <ul className="space-y-3 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">
-              <li>상태 공유와 카페 제보는 손님처럼 바로 할 수 있어요.</li>
+              <li>상태 공유와 카페 제보 화면을 계정 없이 체험할 수 있어요.</li>
               <li>
                 GitHub는 서비스 로그인이 아니라, 코드를 올리고 Cloudflare에 배포할 때 씁니다.
               </li>
               <li>
-                나중에 가짜 제보를 줄이려면 그때 카카오/구글 로그인을 선택 사항으로 넣으면 됩니다.
+                실제 제보 저장 기능과 간편 로그인은 다음 단계에서 연결할 예정이에요.
               </li>
             </ul>
 

@@ -71,7 +71,7 @@ export default function CafeList() {
 
       {showSuccess && (
         <SuccessToast
-          message="현재 상태가 공유되었습니다! 동네 사람들에게 도움이 될 거예요 ☕"
+          message="체험이 완료됐어요. 현재 입력 내용은 저장되지 않습니다."
           onClose={() => setShowSuccess(false)}
         />
       )}
