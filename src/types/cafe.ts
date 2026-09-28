@@ -21,6 +21,7 @@ export interface Cafe {
   outlets: OutletLevel;
   americanoPrice: number;
   lastUpdatedMinutes: number;
+  isUserSubmitted?: boolean;
 }
 
 export interface StatusUpdateForm {

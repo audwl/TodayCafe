@@ -14,7 +14,7 @@ export default function HeroSection({
           <span aria-hidden="true">🚧</span>
           <p>
             <strong className="font-semibold">공개 베타</strong>
-            <span className="text-amber-800"> · 현재 카페와 상태 정보는 서비스 체험용 샘플입니다.</span>
+            <span className="text-amber-800"> · 기본 목록은 샘플이며, 내가 제보한 카페는 이 브라우저에 저장됩니다.</span>
           </p>
         </div>
         <h1 className="text-3xl font-bold leading-tight tracking-tight text-stone-800 sm:text-4xl">

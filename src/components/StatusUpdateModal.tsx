@@ -12,7 +12,7 @@ import {
 interface StatusUpdateModalProps {
   cafe: Cafe | null;
   onClose: () => void;
-  onSubmit: () => void;
+  onSubmit: (form: StatusUpdateForm) => void;
 }
 
 const crowdednessOptions: Crowdedness[] = ["여유", "보통", "혼잡"];
@@ -69,7 +69,7 @@ export default function StatusUpdateModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit();
+    onSubmit(form);
   };
 
   return (
@@ -87,9 +87,9 @@ export default function StatusUpdateModal({
         <div className="mb-5 flex items-start justify-between">
           <div>
             <h2 id="status-modal-title" className="text-lg font-bold text-stone-800">
-              현재 상태 공유 체험
+              현재 상태 공유하기
             </h2>
-            <p className="mt-1 text-sm text-stone-500">{cafe.name} · 입력 내용은 저장되지 않아요</p>
+            <p className="mt-1 text-sm text-stone-500">{cafe.name} · 이 브라우저에 저장돼요</p>
           </div>
           <button
             type="button"
@@ -152,7 +152,7 @@ export default function StatusUpdateModal({
             type="submit"
             className="w-full rounded-xl bg-amber-800 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-900"
           >
-            체험 완료하기
+            현재 상태 저장하기
           </button>
         </form>
       </div>

@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { sampleCafes } from "@/data/sampleCafes";
+import { loadCafes, saveCafes } from "@/lib/cafeStorage";
 import { filterCafes } from "@/lib/cafeUtils";
-import { Cafe, FilterType } from "@/types/cafe";
+import { Cafe, FilterType, StatusUpdateForm } from "@/types/cafe";
 import CafeCard from "./CafeCard";
 import FilterBar from "./FilterBar";
 import HeroSection from "./HeroSection";
@@ -13,15 +14,44 @@ import SuccessToast from "./SuccessToast";
 export default function CafeList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("전체");
+  const [cafes, setCafes] = useState<Cafe[]>(sampleCafes);
   const [selectedCafe, setSelectedCafe] = useState<Cafe | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  useEffect(() => {
+    const loadTimer = window.setTimeout(() => {
+      setCafes(loadCafes());
+      if (new URLSearchParams(window.location.search).has("added")) {
+        setShowSuccess(true);
+        window.history.replaceState(null, "", "/#cafe-list");
+        window.setTimeout(() => setShowSuccess(false), 4000);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(loadTimer);
+  }, []);
+
   const filteredCafes = useMemo(
-    () => filterCafes(sampleCafes, activeFilter, searchQuery),
-    [activeFilter, searchQuery]
+    () => filterCafes(cafes, activeFilter, searchQuery),
+    [activeFilter, cafes, searchQuery]
   );
 
-  const handleSubmitStatus = () => {
+  const handleSubmitStatus = (form: StatusUpdateForm) => {
+    if (!selectedCafe) return;
+    const nextCafes = cafes.map((cafe) =>
+      cafe.id === selectedCafe.id
+        ? {
+            ...cafe,
+            crowdedness: form.crowdedness,
+            noise: form.noise,
+            workFriendly: form.workFriendly ? "추천" as const : "비추천" as const,
+            outlets: form.outlets,
+            lastUpdatedMinutes: 0,
+          }
+        : cafe
+    );
+    setCafes(nextCafes);
+    saveCafes(nextCafes);
     setSelectedCafe(null);
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 4000);
@@ -71,7 +101,7 @@ export default function CafeList() {
 
       {showSuccess && (
         <SuccessToast
-          message="체험이 완료됐어요. 현재 입력 내용은 저장되지 않습니다."
+          message="저장했어요. 이 브라우저에서 변경된 상태를 확인할 수 있습니다."
           onClose={() => setShowSuccess(false)}
         />
       )}

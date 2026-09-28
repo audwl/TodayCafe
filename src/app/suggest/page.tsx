@@ -1,16 +1,30 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import SuccessToast from "@/components/SuccessToast";
+import { FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { loadCafes, saveCafes } from "@/lib/cafeStorage";
+import { Cafe } from "@/types/cafe";
 
 export default function SuggestPage() {
-  const [submitted, setSubmitted] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
-    event.currentTarget.reset();
-    window.setTimeout(() => setSubmitted(false), 4000);
+    const formData = new FormData(event.currentTarget);
+    const cafe: Cafe = {
+      id: `user-${Date.now()}`,
+      name: String(formData.get("name") ?? "").trim(),
+      neighborhood: String(formData.get("neighborhood") ?? "").trim(),
+      crowdedness: "보통",
+      noise: "보통",
+      workFriendly: "가능",
+      outlets: "보통",
+      americanoPrice: Number(formData.get("americanoPrice")),
+      lastUpdatedMinutes: 0,
+      isUserSubmitted: true,
+    };
+    saveCafes([cafe, ...loadCafes()]);
+    router.push("/?added=1#cafe-list");
   };
 
   return (
@@ -20,8 +34,7 @@ export default function SuggestPage() {
         동네 카페 알려주기
       </h1>
       <p className="mt-3 text-stone-500">
-        실제 카페 제보 기능을 준비하고 있습니다. 지금은 입력 흐름을 미리 체험할 수 있으며,
-        작성한 내용은 저장되지 않습니다.
+        제보한 카페는 이 브라우저에 바로 저장되고 카페 찾기 목록에 표시됩니다.
       </p>
 
       <form
@@ -34,6 +47,19 @@ export default function SuggestPage() {
             required
             name="name"
             placeholder="예: 카페 온도"
+            className="mt-1.5 w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20"
+          />
+        </label>
+        <label className="block text-sm font-medium text-stone-700">
+          아메리카노 가격
+          <input
+            required
+            min="0"
+            step="100"
+            type="number"
+            inputMode="numeric"
+            name="americanoPrice"
+            placeholder="예: 4500"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20"
           />
         </label>
@@ -59,16 +85,9 @@ export default function SuggestPage() {
           type="submit"
           className="w-full rounded-xl bg-amber-800 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-900"
         >
-          제보 화면 체험하기
+          카페 등록하기
         </button>
       </form>
-
-      {submitted ? (
-        <SuccessToast
-          message="제보가 도착한 것처럼 보여 드렸어요. 저장은 다음 단계에서 연결할게요."
-          onClose={() => setSubmitted(false)}
-        />
-      ) : null}
     </section>
   );
 }
