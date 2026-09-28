@@ -38,15 +38,16 @@ const worker = {
       );
     }
 
-    const endpoint = new URL("https://openapi.naver.com/v1/search/local.json");
+    const endpoint = new URL("https://naverapihub.apigw.ntruss.com/search/v1/local");
     endpoint.searchParams.set("query", `${query} 카페`);
     endpoint.searchParams.set("display", "5");
     endpoint.searchParams.set("sort", "comment");
+    endpoint.searchParams.set("format", "json");
 
     const response = await fetch(endpoint, {
       headers: {
-        "X-Naver-Client-Id": env.NAVER_CLIENT_ID,
-        "X-Naver-Client-Secret": env.NAVER_CLIENT_SECRET,
+        "X-NCP-APIGW-API-KEY-ID": env.NAVER_CLIENT_ID,
+        "X-NCP-APIGW-API-KEY": env.NAVER_CLIENT_SECRET,
       },
     });
 

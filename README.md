@@ -31,7 +31,7 @@ npm run dev
 
 ### 네이버 실제 카페 검색
 
-네이버 개발자 센터에서 검색 API 애플리케이션을 만든 뒤 Cloudflare Worker의 Secrets에 다음 값을 등록합니다.
+NAVER Cloud Platform의 NAVER API HUB에서 검색 API 이용을 신청하고 Application을 만든 뒤 Cloudflare Worker의 Secrets에 다음 값을 등록합니다.
 
 - `NAVER_CLIENT_ID`
 - `NAVER_CLIENT_SECRET`
