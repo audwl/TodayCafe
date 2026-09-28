@@ -14,8 +14,57 @@ interface NaverLocalItem {
   mapy: string;
 }
 
+interface NaverLocalResponse {
+  items?: NaverLocalItem[];
+}
+
 function stripTags(value: string): string {
   return value.replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").trim();
+}
+
+async function searchNaverLocal(
+  query: string,
+  env: Env
+): Promise<NaverLocalItem[]> {
+  const endpoint = new URL("https://naverapihub.apigw.ntruss.com/search/v1/local");
+  endpoint.searchParams.set("query", query);
+  endpoint.searchParams.set("display", "5");
+  endpoint.searchParams.set("sort", "comment");
+  endpoint.searchParams.set("format", "json");
+
+  const response = await fetch(endpoint, {
+    headers: {
+      "X-NCP-APIGW-API-KEY-ID": env.NAVER_CLIENT_ID!,
+      "X-NCP-APIGW-API-KEY": env.NAVER_CLIENT_SECRET!,
+    },
+  });
+
+  if (!response.ok) return [];
+
+  const data = (await response.json()) as NaverLocalResponse;
+  return data.items ?? [];
+}
+
+function mixUniqueResults(resultGroups: NaverLocalItem[][]): NaverLocalItem[] {
+  const mixed: NaverLocalItem[] = [];
+  const seen = new Set<string>();
+  const maxGroupSize = Math.max(0, ...resultGroups.map((group) => group.length));
+
+  for (let index = 0; index < maxGroupSize; index += 1) {
+    for (const group of resultGroups) {
+      const item = group[index];
+      if (!item) continue;
+
+      const key = `${item.mapx}:${item.mapy}:${stripTags(item.title)}`;
+      if (seen.has(key)) continue;
+
+      seen.add(key);
+      mixed.push(item);
+      if (mixed.length === 12) return mixed;
+    }
+  }
+
+  return mixed;
 }
 
 const worker = {
@@ -38,25 +87,18 @@ const worker = {
       );
     }
 
-    const endpoint = new URL("https://naverapihub.apigw.ntruss.com/search/v1/local");
-    endpoint.searchParams.set("query", `${query} 카페`);
-    endpoint.searchParams.set("display", "5");
-    endpoint.searchParams.set("sort", "comment");
-    endpoint.searchParams.set("format", "json");
+    const resultGroups = await Promise.all([
+      searchNaverLocal(`${query} 카페`, env),
+      searchNaverLocal(`${query} 로스터리`, env),
+      searchNaverLocal(`${query} 베이커리`, env),
+    ]);
+    const results = mixUniqueResults(resultGroups);
 
-    const response = await fetch(endpoint, {
-      headers: {
-        "X-NCP-APIGW-API-KEY-ID": env.NAVER_CLIENT_ID,
-        "X-NCP-APIGW-API-KEY": env.NAVER_CLIENT_SECRET,
-      },
-    });
-
-    if (!response.ok) {
+    if (results.length === 0) {
       return Response.json({ error: "네이버 검색 결과를 불러오지 못했습니다." }, { status: 502 });
     }
 
-    const data = (await response.json()) as { items?: NaverLocalItem[] };
-    const items = (data.items ?? []).map((item) => ({
+    const items = results.map((item) => ({
       ...item,
       title: stripTags(item.title),
       category: stripTags(item.category),

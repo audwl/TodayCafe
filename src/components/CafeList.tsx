@@ -138,7 +138,7 @@ export default function CafeList() {
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <h2 className="font-semibold text-stone-800">네이버 실제 카페 검색 결과</h2>
-                <span className="text-xs text-stone-500">최대 5개</span>
+                <span className="text-xs text-stone-500">다양한 카페 최대 12개</span>
               </div>
               <div className="grid gap-2 sm:grid-cols-2">
                 {places.map((place) => (
