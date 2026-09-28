@@ -1,6 +1,7 @@
-import { Cafe, Crowdedness, FilterType } from "@/types/cafe";
+import { Cafe, Crowdedness, FilterType, WorkFriendly } from "@/types/cafe";
 
-export function getCrowdednessEmoji(crowdedness: Crowdedness): string {
+export function getCrowdednessEmoji(crowdedness: Crowdedness | null): string {
+  if (!crowdedness) return "⚪";
   const map: Record<Crowdedness, string> = {
     여유: "🟢",
     보통: "🟡",
@@ -10,7 +11,8 @@ export function getCrowdednessEmoji(crowdedness: Crowdedness): string {
 }
 
 export function getWorkFriendlyLabel(workFriendly: Cafe["workFriendly"]): string {
-  const map: Record<Cafe["workFriendly"], string> = {
+  if (!workFriendly) return "정보 없음";
+  const map: Record<WorkFriendly, string> = {
     추천: "👍 추천",
     가능: "가능",
     비추천: "비추천",
@@ -18,7 +20,8 @@ export function getWorkFriendlyLabel(workFriendly: Cafe["workFriendly"]): string
   return map[workFriendly];
 }
 
-export function formatPrice(price: number): string {
+export function formatPrice(price: number | null): string {
+  if (price === null) return "정보 없음";
   return `${price.toLocaleString("ko-KR")}원`;
 }
 
@@ -26,7 +29,12 @@ export function formatLastUpdated(minutes: number): string {
   return `${minutes}분 전`;
 }
 
-export function getNaverMapUrl(cafe: Pick<Cafe, "name" | "neighborhood">): string {
+export function getNaverMapUrl(
+  cafe: Pick<Cafe, "name" | "neighborhood" | "naverMapUrl">
+): string {
+  if (cafe.naverMapUrl) {
+    return cafe.naverMapUrl;
+  }
   const query = encodeURIComponent(`${cafe.neighborhood} ${cafe.name}`);
   return `https://map.naver.com/p/search/${query}`;
 }

@@ -29,7 +29,9 @@ export default function CafeCard({ cafe, onReportStatus }: CafeCardProps) {
               지도 ↗
             </a>
           </div>
-          <p className="mt-0.5 text-sm text-stone-500">{cafe.neighborhood}</p>
+          <p className="mt-0.5 text-sm text-stone-500">
+            {cafe.address || cafe.neighborhood}
+          </p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
           <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${
@@ -49,12 +51,12 @@ export default function CafeCard({ cafe, onReportStatus }: CafeCardProps) {
         <div>
           <dt className="text-stone-400">혼잡도</dt>
           <dd className="mt-0.5 font-medium text-stone-700">
-            {getCrowdednessEmoji(cafe.crowdedness)} {cafe.crowdedness}
+            {getCrowdednessEmoji(cafe.crowdedness)} {cafe.crowdedness || "정보 없음"}
           </dd>
         </div>
         <div>
           <dt className="text-stone-400">소음</dt>
-          <dd className="mt-0.5 font-medium text-stone-700">{cafe.noise}</dd>
+          <dd className="mt-0.5 font-medium text-stone-700">{cafe.noise || "정보 없음"}</dd>
         </div>
         <div>
           <dt className="text-stone-400">카공</dt>
@@ -64,7 +66,7 @@ export default function CafeCard({ cafe, onReportStatus }: CafeCardProps) {
         </div>
         <div>
           <dt className="text-stone-400">콘센트</dt>
-          <dd className="mt-0.5 font-medium text-stone-700">{cafe.outlets}</dd>
+          <dd className="mt-0.5 font-medium text-stone-700">{cafe.outlets || "정보 없음"}</dd>
         </div>
         <div className="col-span-2">
           <dt className="text-stone-400">아메리카노</dt>

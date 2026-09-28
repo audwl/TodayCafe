@@ -15,13 +15,26 @@ export interface Cafe {
   id: string;
   name: string;
   neighborhood: string;
-  crowdedness: Crowdedness;
-  noise: NoiseLevel;
-  workFriendly: WorkFriendly;
-  outlets: OutletLevel;
-  americanoPrice: number;
+  address?: string;
+  category?: string;
+  naverMapUrl?: string;
+  crowdedness: Crowdedness | null;
+  noise: NoiseLevel | null;
+  workFriendly: WorkFriendly | null;
+  outlets: OutletLevel | null;
+  americanoPrice: number | null;
   lastUpdatedMinutes: number;
   isUserSubmitted?: boolean;
+}
+
+export interface NaverPlace {
+  title: string;
+  category: string;
+  address: string;
+  roadAddress: string;
+  link: string;
+  mapx: string;
+  mapy: string;
 }
 
 export interface StatusUpdateForm {

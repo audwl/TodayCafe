@@ -29,6 +29,15 @@ npm run dev
    - Build command: `npm run build`
    - Deploy command: `npx wrangler deploy`
 
+### 네이버 실제 카페 검색
+
+네이버 개발자 센터에서 검색 API 애플리케이션을 만든 뒤 Cloudflare Worker의 Secrets에 다음 값을 등록합니다.
+
+- `NAVER_CLIENT_ID`
+- `NAVER_CLIENT_SECRET`
+
+시크릿은 GitHub이나 클라이언트 코드에 저장하지 않습니다.
+
 로컬에서 한 번 올려 보려면:
 
 ```bash
