@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { sampleCafes } from "@/data/sampleCafes";
 import { loadCafes, saveCafes } from "@/lib/cafeStorage";
-import { filterCafes } from "@/lib/cafeUtils";
+import { calculateDistanceKm, filterCafes } from "@/lib/cafeUtils";
 import {
   Cafe,
   Crowdedness,
@@ -43,6 +43,12 @@ export default function CafeList() {
     cafeId: string;
     status: Crowdedness;
   } | null>(null);
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [isDistanceSort, setIsDistanceSort] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
 
   useEffect(() => {
     const loadTimer = window.setTimeout(() => {
@@ -89,15 +95,62 @@ export default function CafeList() {
   const filteredCafes = useMemo(() => {
     const cafesWithLiveCrowds = cafes.map((cafe) => {
       const summary = reportSummaries[cafe.id];
-      if (!summary?.total) return cafe;
-      return {
+      const withLiveCrowd = summary?.total ? {
         ...cafe,
         crowdedness: summary.status,
+      } : cafe;
+
+      if (!userLocation || !cafe.latitude || !cafe.longitude) return withLiveCrowd;
+      return {
+        ...withLiveCrowd,
+        distanceKm: calculateDistanceKm(userLocation, {
+          latitude: cafe.latitude,
+          longitude: cafe.longitude,
+        }),
       };
     });
 
-    return filterCafes(cafesWithLiveCrowds, activeFilter, searchQuery);
-  }, [activeFilter, cafes, reportSummaries, searchQuery]);
+    const filtered = filterCafes(cafesWithLiveCrowds, activeFilter, searchQuery);
+    return isDistanceSort
+      ? [...filtered].sort(
+          (left, right) =>
+            (left.distanceKm ?? Number.POSITIVE_INFINITY) -
+            (right.distanceKm ?? Number.POSITIVE_INFINITY)
+        )
+      : filtered;
+  }, [activeFilter, cafes, isDistanceSort, reportSummaries, searchQuery, userLocation]);
+
+  const handleToggleDistanceSort = () => {
+    if (isDistanceSort) {
+      setIsDistanceSort(false);
+      return;
+    }
+    if (userLocation) {
+      setIsDistanceSort(true);
+      return;
+    }
+    if (!navigator.geolocation) {
+      setSearchError("이 브라우저에서는 위치 기능을 지원하지 않습니다.");
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+        setIsDistanceSort(true);
+        setIsLocating(false);
+      },
+      () => {
+        setSearchError("거리순 정렬을 사용하려면 위치 권한을 허용해 주세요.");
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+    );
+  };
 
   const handleNaverSearch = async () => {
     const query = searchQuery.trim();
@@ -135,6 +188,8 @@ export default function CafeList() {
       neighborhood: address.split(" ").slice(1, 3).join(" ") || address,
       address,
       category: place.category,
+      longitude: Number(place.mapx) / 10_000_000,
+      latitude: Number(place.mapy) / 10_000_000,
       crowdedness: null,
       noise: null,
       workFriendly: null,
@@ -210,6 +265,9 @@ export default function CafeList() {
       <FilterBar
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
+        isDistanceSort={isDistanceSort}
+        isLocating={isLocating}
+        onToggleDistanceSort={handleToggleDistanceSort}
       />
 
       {(places.length > 0 || searchError) && (

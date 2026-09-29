@@ -14,11 +14,17 @@ export function loadCafes(): Cafe[] {
 
     const savedCafes = (parsed as Cafe[])
       .filter((cafe) => !LEGACY_SAMPLE_IDS.has(cafe.id))
-      .map((cafe) =>
-        cafe.id.startsWith("naver-")
-          ? { ...cafe, naverMapUrl: undefined, isVerifiedPlace: true }
-          : cafe
-      );
+      .map((cafe) => {
+        const naverCoordinates = cafe.id.match(/^naver-(\d+)-(\d+)$/);
+        if (!naverCoordinates) return cafe;
+        return {
+          ...cafe,
+          naverMapUrl: undefined,
+          isVerifiedPlace: true,
+          longitude: Number(naverCoordinates[1]) / 10_000_000,
+          latitude: Number(naverCoordinates[2]) / 10_000_000,
+        };
+      });
     const savedById = new Map(savedCafes.map((cafe) => [cafe.id, cafe]));
     const sampleIds = new Set(sampleCafes.map((cafe) => cafe.id));
     const samplePlaceKeys = new Set(

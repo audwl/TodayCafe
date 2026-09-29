@@ -2,6 +2,7 @@ export type Crowdedness = "여유" | "보통" | "혼잡";
 export type NoiseLevel = "조용" | "보통" | "시끄러움";
 export type WorkFriendly = "추천" | "가능" | "비추천";
 export type OutletLevel = "많음" | "보통" | "적음";
+export type VibeTag = "조용한" | "카공" | "대형" | "베이커리" | "로스터리" | "디저트";
 
 export interface CrowdReportSummary {
   cafeId: string;
@@ -14,11 +15,11 @@ export interface CrowdReportSummary {
 
 export type FilterType =
   | "전체"
-  | "여유"
-  | "보통"
-  | "혼잡"
-  | "조용한 카페"
-  | "카공 추천";
+  | "조용한"
+  | "카공"
+  | "대형"
+  | "베이커리"
+  | "로스터리";
 
 export interface Cafe {
   id: string;
@@ -27,6 +28,11 @@ export interface Cafe {
   address?: string;
   category?: string;
   naverMapUrl?: string;
+  latitude?: number;
+  longitude?: number;
+  distanceKm?: number;
+  vibeTags?: VibeTag[];
+  vibeSource?: "example" | "reviews" | "community";
   crowdedness: Crowdedness | null;
   noise: NoiseLevel | null;
   workFriendly: WorkFriendly | null;

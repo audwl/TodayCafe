@@ -44,6 +44,23 @@ export function getNaverBlogSearchUrl(cafe: Pick<Cafe, "name" | "neighborhood">)
   return `https://search.naver.com/search.naver?where=blog&query=${query}`;
 }
 
+export function calculateDistanceKm(
+  from: { latitude: number; longitude: number },
+  to: { latitude: number; longitude: number }
+): number {
+  const earthRadiusKm = 6371;
+  const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
+  const latitudeDelta = toRadians(to.latitude - from.latitude);
+  const longitudeDelta = toRadians(to.longitude - from.longitude);
+  const startLatitude = toRadians(from.latitude);
+  const endLatitude = toRadians(to.latitude);
+  const haversine =
+    Math.sin(latitudeDelta / 2) ** 2 +
+    Math.cos(startLatitude) * Math.cos(endLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+
+  return earthRadiusKm * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+}
+
 export function filterCafes(
   cafes: Cafe[],
   filter: FilterType,
@@ -58,19 +75,26 @@ export function filterCafes(
         cafe.name.toLowerCase().includes(query) ||
         cafe.neighborhood.toLowerCase().includes(query) ||
         cafe.address?.toLowerCase().includes(query) ||
-        cafe.category?.toLowerCase().includes(query)
+        cafe.category?.toLowerCase().includes(query) ||
+        cafe.vibeTags?.some((tag) => tag.toLowerCase().includes(query))
     );
   }
 
   switch (filter) {
-    case "여유":
-    case "보통":
-    case "혼잡":
-      return result.filter((cafe) => cafe.crowdedness === filter);
-    case "조용한 카페":
-      return result.filter((cafe) => cafe.noise === "조용");
-    case "카공 추천":
-      return result.filter((cafe) => cafe.workFriendly === "추천");
+    case "조용한":
+      return result.filter((cafe) => cafe.vibeTags?.includes("조용한"));
+    case "카공":
+      return result.filter((cafe) => cafe.vibeTags?.includes("카공"));
+    case "대형":
+      return result.filter((cafe) => cafe.vibeTags?.includes("대형"));
+    case "베이커리":
+      return result.filter(
+        (cafe) => cafe.vibeTags?.includes("베이커리") || cafe.category?.includes("베이커리")
+      );
+    case "로스터리":
+      return result.filter(
+        (cafe) => cafe.vibeTags?.includes("로스터리") || cafe.category?.includes("로스터리")
+      );
     default:
       return result;
   }

@@ -73,10 +73,32 @@ export default function CafeCard({
           <p className="mt-0.5 text-sm text-stone-500">
             {cafe.address || cafe.neighborhood}
           </p>
+          {typeof cafe.distanceKm === "number" ? (
+            <p className="mt-1 text-xs font-medium text-emerald-700">
+              내 위치에서 {cafe.distanceKm < 1
+                ? `${Math.round(cafe.distanceKm * 1000)}m`
+                : `${cafe.distanceKm.toFixed(1)}km`}
+            </p>
+          ) : null}
           {cafe.category ? (
             <p className="mt-2 inline-flex rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-600">
               {cafe.category}
             </p>
+          ) : null}
+          {cafe.vibeTags?.length ? (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {cafe.vibeTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-violet-50 px-2 py-1 text-xs font-medium text-violet-700"
+                >
+                  #{tag}
+                </span>
+              ))}
+              {cafe.vibeSource === "example" ? (
+                <span className="px-1 py-1 text-[11px] text-stone-400">분위기 참고</span>
+              ) : null}
+            </div>
           ) : null}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
