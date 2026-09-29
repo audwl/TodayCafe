@@ -32,6 +32,11 @@ export default function CafeCard({ cafe, onReportStatus }: CafeCardProps) {
           <p className="mt-0.5 text-sm text-stone-500">
             {cafe.address || cafe.neighborhood}
           </p>
+          {cafe.category ? (
+            <p className="mt-2 inline-flex rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-600">
+              {cafe.category}
+            </p>
+          ) : null}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
           <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${

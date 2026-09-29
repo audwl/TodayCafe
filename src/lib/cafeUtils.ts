@@ -51,7 +51,9 @@ export function filterCafes(
     result = result.filter(
       (cafe) =>
         cafe.name.toLowerCase().includes(query) ||
-        cafe.neighborhood.toLowerCase().includes(query)
+        cafe.neighborhood.toLowerCase().includes(query) ||
+        cafe.address?.toLowerCase().includes(query) ||
+        cafe.category?.toLowerCase().includes(query)
     );
   }
 
