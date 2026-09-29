@@ -17,6 +17,7 @@ import HeroSection from "./HeroSection";
 import SuccessToast from "./SuccessToast";
 
 const REPORTER_ID_KEY = "todaycafe:reporter-id:v1";
+const MY_REPORTS_KEY = "todaycafe:my-crowd-reports:v1";
 
 function getReporterId(): string {
   const saved = window.localStorage.getItem(REPORTER_ID_KEY);
@@ -37,11 +38,23 @@ export default function CafeList() {
   const [searchError, setSearchError] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [reportSummaries, setReportSummaries] = useState<Record<string, CrowdReportSummary>>({});
-  const [reportingCafeId, setReportingCafeId] = useState<string | null>(null);
+  const [myReports, setMyReports] = useState<Record<string, Crowdedness>>({});
+  const [reportingChoice, setReportingChoice] = useState<{
+    cafeId: string;
+    status: Crowdedness;
+  } | null>(null);
 
   useEffect(() => {
     const loadTimer = window.setTimeout(() => {
       setCafes(loadCafes());
+      try {
+        const savedReports = JSON.parse(
+          window.localStorage.getItem(MY_REPORTS_KEY) || "{}"
+        ) as Record<string, Crowdedness>;
+        setMyReports(savedReports);
+      } catch {
+        setMyReports({});
+      }
       if (new URLSearchParams(window.location.search).has("added")) {
         setSuccessMessage("카페를 내 목록에 저장했어요.");
         setShowSuccess(true);
@@ -133,7 +146,7 @@ export default function CafeList() {
   };
 
   const handleQuickReport = async (targetCafe: Cafe, crowdedness: Crowdedness) => {
-    setReportingCafeId(targetCafe.id);
+    setReportingChoice({ cafeId: targetCafe.id, status: crowdedness });
     setSearchError("");
 
     try {
@@ -158,6 +171,11 @@ export default function CafeList() {
         ...current,
         [targetCafe.id]: data.summary!,
       }));
+      setMyReports((current) => {
+        const next = { ...current, [targetCafe.id]: crowdedness };
+        window.localStorage.setItem(MY_REPORTS_KEY, JSON.stringify(next));
+        return next;
+      });
       setSuccessMessage(
         data.summary.total < 3
           ? `${targetCafe.name} 제보가 접수됐어요. ${3 - data.summary.total}건 더 모이면 상태가 표시돼요.`
@@ -168,7 +186,7 @@ export default function CafeList() {
     } catch (error) {
       setSearchError(error instanceof Error ? error.message : "제보 중 오류가 발생했습니다.");
     } finally {
-      setReportingCafeId(null);
+      setReportingChoice(null);
     }
   };
 
@@ -238,7 +256,10 @@ export default function CafeList() {
                 key={cafe.id}
                 cafe={cafe}
                 reportSummary={reportSummaries[cafe.id]}
-                isReporting={reportingCafeId === cafe.id}
+                selectedReport={myReports[cafe.id]}
+                reportingStatus={
+                  reportingChoice?.cafeId === cafe.id ? reportingChoice.status : null
+                }
                 onReportCrowdedness={handleQuickReport}
               />
             ))}
