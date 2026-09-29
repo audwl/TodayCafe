@@ -39,6 +39,11 @@ export function getNaverMapUrl(
   return `https://map.naver.com/p/search/${query}`;
 }
 
+export function getNaverBlogSearchUrl(cafe: Pick<Cafe, "name" | "neighborhood">): string {
+  const query = encodeURIComponent(`${cafe.neighborhood} ${cafe.name}`);
+  return `https://search.naver.com/search.naver?where=blog&query=${query}`;
+}
+
 export function filterCafes(
   cafes: Cafe[],
   filter: FilterType,

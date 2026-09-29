@@ -3,6 +3,7 @@ import {
   formatLastUpdated,
   formatPrice,
   getCrowdednessEmoji,
+  getNaverBlogSearchUrl,
   getNaverMapUrl,
   getWorkFriendlyLabel,
 } from "@/lib/cafeUtils";
@@ -32,6 +33,15 @@ export default function CafeCard({ cafe, onReportStatus }: CafeCardProps) {
             >
               지도 ↗
             </a>
+            <a
+              href={getNaverBlogSearchUrl(cafe)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-sky-50 px-2 py-1 text-xs font-medium text-sky-800 transition-colors hover:bg-sky-100"
+              aria-label={`${cafe.name} 네이버 블로그 후기 검색`}
+            >
+              후기 ↗
+            </a>
           </div>
           <p className="mt-0.5 text-sm text-stone-500">
             {cafe.address || cafe.neighborhood}
@@ -51,7 +61,11 @@ export default function CafeCard({ cafe, onReportStatus }: CafeCardProps) {
             {cafe.isUserSubmitted ? "내 목록" : cafe.isVerifiedPlace ? "실제 장소" : "등록 카페"}
           </span>
           <span className="text-xs text-stone-400">
-            {hasStatus ? formatLastUpdated(cafe.lastUpdatedMinutes) : "상태 제보 대기"}
+            {cafe.statusSource === "example"
+              ? "예시 상태 · 실제와 다를 수 있어요"
+              : hasStatus
+                ? formatLastUpdated(cafe.lastUpdatedMinutes)
+                : "상태 제보 대기"}
           </span>
         </div>
       </div>

@@ -26,6 +26,7 @@ export interface Cafe {
   lastUpdatedMinutes: number;
   isUserSubmitted?: boolean;
   isVerifiedPlace?: boolean;
+  statusSource?: "example" | "community";
 }
 
 export interface NaverPlace {

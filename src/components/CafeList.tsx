@@ -103,6 +103,7 @@ export default function CafeList() {
             workFriendly: form.workFriendly ? "추천" as const : "비추천" as const,
             outlets: form.outlets,
             lastUpdatedMinutes: 0,
+            statusSource: "community" as const,
           }
         : cafe
     );

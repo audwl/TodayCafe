@@ -1,7 +1,7 @@
 import { Cafe } from "@/types/cafe";
 
 // NAVER API HUB 지역 검색으로 이름과 도로명 주소를 확인한 실제 장소입니다.
-// 혼잡도·소음·카공·가격은 API가 제공하지 않으므로 제보 전까지 비워 둡니다.
+// 혼잡도·소음·카공은 화면 체험을 위한 예시이며 실제 현황을 의미하지 않습니다.
 const verifiedPlaces = [
   ["1269060383-375550335", "어글리베이커리", "망원동", "서울특별시 마포구 월드컵로13길 73 1층 어글리 베이커리", "카페,디저트 > 베이커리"],
   ["1269021320-375541375", "센토브 커피", "망원동", "서울특별시 마포구 희우정로 98 1층 센토브", "카페,디저트 > 카페"],
@@ -23,19 +23,26 @@ const verifiedPlaces = [
   ["1268868599-375179897", "커피랩스로스터리", "문래동", "서울특별시 영등포구 선유로9길 10 문래SKV1센터 1층 122호", "카페,디저트 > 로스터리"],
 ] as const;
 
+const exampleStatuses: Array<Pick<Cafe, "crowdedness" | "noise" | "workFriendly" | "outlets">> = [
+  { crowdedness: "여유", noise: "조용", workFriendly: "추천", outlets: "많음" },
+  { crowdedness: "보통", noise: "보통", workFriendly: "가능", outlets: "보통" },
+  { crowdedness: "혼잡", noise: "시끄러움", workFriendly: "비추천", outlets: "적음" },
+  { crowdedness: "여유", noise: "보통", workFriendly: "가능", outlets: "보통" },
+  { crowdedness: "보통", noise: "조용", workFriendly: "추천", outlets: "많음" },
+  { crowdedness: "혼잡", noise: "보통", workFriendly: "비추천", outlets: "적음" },
+];
+
 export const sampleCafes: Cafe[] = verifiedPlaces.map(
-  ([coordinates, name, neighborhood, address, category]) => ({
+  ([coordinates, name, neighborhood, address, category], index) => ({
     id: `place-${coordinates}`,
     name,
     neighborhood,
     address,
     category,
-    crowdedness: null,
-    noise: null,
-    workFriendly: null,
-    outlets: null,
+    ...exampleStatuses[index % exampleStatuses.length],
     americanoPrice: null,
     lastUpdatedMinutes: 0,
     isVerifiedPlace: true,
+    statusSource: "example",
   })
 );

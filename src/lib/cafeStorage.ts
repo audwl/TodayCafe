@@ -29,11 +29,28 @@ export function loadCafes(): Cafe[] {
         !sampleIds.has(cafe.id) &&
         !samplePlaceKeys.has(`${cafe.name}:${cafe.address || cafe.neighborhood}`)
     );
-    const mergedSamples = sampleCafes.map((sample) => ({
-      ...sample,
-      ...savedById.get(sample.id),
-      category: savedById.get(sample.id)?.category || sample.category,
-    }));
+    const mergedSamples = sampleCafes.map((sample) => {
+      const savedCafe = savedById.get(sample.id);
+      const hasLegacyStatus = Boolean(
+        savedCafe?.crowdedness ||
+        savedCafe?.noise ||
+        savedCafe?.workFriendly ||
+        savedCafe?.outlets
+      );
+      const hasCommunityStatus = Boolean(
+        savedCafe?.statusSource === "community" ||
+        (savedCafe?.statusSource !== "example" && hasLegacyStatus)
+      );
+
+      if (!savedCafe || !hasCommunityStatus) return sample;
+
+      return {
+        ...sample,
+        ...savedCafe,
+        category: savedCafe.category || sample.category,
+        statusSource: "community" as const,
+      };
+    });
 
     return [...submittedCafes, ...mergedSamples];
   } catch {
