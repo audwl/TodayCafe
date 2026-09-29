@@ -18,7 +18,7 @@ export default function HeroSection({
           <span aria-hidden="true">🚧</span>
           <p>
             <strong className="font-semibold">공개 베타</strong>
-            <span className="text-amber-800"> · 기본 목록은 샘플이며, 내가 제보한 카페는 이 브라우저에 저장됩니다.</span>
+            <span className="text-amber-800"> · 기본 목록은 네이버에서 확인한 실제 장소이며, 현재 상태는 이웃의 제보로 채워집니다.</span>
           </p>
         </div>
         <h1 className="text-3xl font-bold leading-tight tracking-tight text-stone-800 sm:text-4xl">

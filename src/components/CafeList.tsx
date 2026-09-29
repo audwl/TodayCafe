@@ -75,7 +75,6 @@ export default function CafeList() {
       neighborhood: address.split(" ").slice(1, 3).join(" ") || address,
       address,
       category: place.category,
-      naverMapUrl: place.link || undefined,
       crowdedness: null,
       noise: null,
       workFriendly: null,
@@ -83,6 +82,7 @@ export default function CafeList() {
       americanoPrice: null,
       lastUpdatedMinutes: 0,
       isUserSubmitted: true,
+      isVerifiedPlace: true,
     };
     const nextCafes = [cafe, ...cafes];
     setCafes(nextCafes);

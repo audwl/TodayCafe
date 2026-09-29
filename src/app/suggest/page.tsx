@@ -46,7 +46,7 @@ export default function SuggestPage() {
           <input
             required
             name="name"
-            placeholder="예: 카페 온도"
+            placeholder="예: 커피한약방"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20"
           />
         </label>

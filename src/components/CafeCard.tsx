@@ -13,6 +13,10 @@ interface CafeCardProps {
 }
 
 export default function CafeCard({ cafe, onReportStatus }: CafeCardProps) {
+  const hasStatus = Boolean(
+    cafe.crowdedness || cafe.noise || cafe.workFriendly || cafe.outlets
+  );
+
   return (
     <article className="flex flex-col rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
       <div className="mb-4 flex items-start justify-between gap-3">
@@ -44,10 +48,10 @@ export default function CafeCard({ cafe, onReportStatus }: CafeCardProps) {
               ? "bg-emerald-50 text-emerald-800"
               : "bg-amber-50 text-amber-800"
           }`}>
-            {cafe.isUserSubmitted ? "내 제보" : "샘플 정보"}
+            {cafe.isUserSubmitted ? "내 목록" : cafe.isVerifiedPlace ? "실제 장소" : "등록 카페"}
           </span>
           <span className="text-xs text-stone-400">
-            {cafe.isUserSubmitted ? formatLastUpdated(cafe.lastUpdatedMinutes) : `예시 · ${formatLastUpdated(cafe.lastUpdatedMinutes)}`}
+            {hasStatus ? formatLastUpdated(cafe.lastUpdatedMinutes) : "상태 제보 대기"}
           </span>
         </div>
       </div>

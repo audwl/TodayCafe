@@ -28,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main className="flex-1">{children}</main>
         <footer className="border-t border-stone-200 bg-white py-8 text-center text-sm text-stone-400">
           <p>© 2026 오늘카페 · 공개 베타</p>
-          <p className="mt-1">현재는 샘플 데이터로 서비스 경험을 검증하고 있어요.</p>
+          <p className="mt-1">실제 장소 정보와 이웃의 상태 제보로 운영되는 공개 베타예요.</p>
         </footer>
       </body>
     </html>

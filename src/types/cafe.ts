@@ -25,6 +25,7 @@ export interface Cafe {
   americanoPrice: number | null;
   lastUpdatedMinutes: number;
   isUserSubmitted?: boolean;
+  isVerifiedPlace?: boolean;
 }
 
 export interface NaverPlace {
