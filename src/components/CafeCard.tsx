@@ -1,4 +1,4 @@
-import { Cafe, Crowdedness } from "@/types/cafe";
+import { Cafe, Crowdedness, CrowdReportSummary } from "@/types/cafe";
 import {
   formatLastUpdated,
   formatPrice,
@@ -10,6 +10,8 @@ import {
 
 interface CafeCardProps {
   cafe: Cafe;
+  reportSummary?: CrowdReportSummary;
+  isReporting: boolean;
   onReportCrowdedness: (cafe: Cafe, crowdedness: Crowdedness) => void;
 }
 
@@ -19,10 +21,25 @@ const quickReportOptions: Array<{ value: Crowdedness; label: string; emoji: stri
   { value: "혼잡", label: "혼잡", emoji: "🔴" },
 ];
 
-export default function CafeCard({ cafe, onReportCrowdedness }: CafeCardProps) {
+export default function CafeCard({
+  cafe,
+  reportSummary,
+  isReporting,
+  onReportCrowdedness,
+}: CafeCardProps) {
   const hasStatus = Boolean(
     cafe.crowdedness || cafe.noise || cafe.workFriendly || cafe.outlets
   );
+  const displayedCrowdedness = reportSummary?.status || cafe.crowdedness;
+  const reportStatusLabel = reportSummary?.status
+    ? `최근 60분 ${reportSummary.total}명 · 신뢰도 ${reportSummary.confidence}`
+    : reportSummary?.total
+      ? `최근 제보 ${reportSummary.total}건 · 3건부터 집계`
+      : cafe.statusSource === "example"
+        ? "예시 상태 · 실제와 다를 수 있어요"
+        : hasStatus
+          ? formatLastUpdated(cafe.lastUpdatedMinutes)
+          : "최근 제보 없음";
 
   return (
     <article className="flex flex-col rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
@@ -67,11 +84,7 @@ export default function CafeCard({ cafe, onReportCrowdedness }: CafeCardProps) {
             {cafe.isUserSubmitted ? "내 목록" : cafe.isVerifiedPlace ? "실제 장소" : "등록 카페"}
           </span>
           <span className="text-xs text-stone-400">
-            {cafe.statusSource === "example"
-              ? "예시 상태 · 실제와 다를 수 있어요"
-              : hasStatus
-                ? formatLastUpdated(cafe.lastUpdatedMinutes)
-                : "상태 제보 대기"}
+            {reportStatusLabel}
           </span>
         </div>
       </div>
@@ -80,7 +93,7 @@ export default function CafeCard({ cafe, onReportCrowdedness }: CafeCardProps) {
         <div>
           <dt className="text-stone-400">혼잡도</dt>
           <dd className="mt-0.5 font-medium text-stone-700">
-            {getCrowdednessEmoji(cafe.crowdedness)} {cafe.crowdedness || "정보 없음"}
+            {getCrowdednessEmoji(displayedCrowdedness)} {displayedCrowdedness || "정보 없음"}
           </dd>
         </div>
         <div>
@@ -115,10 +128,14 @@ export default function CafeCard({ cafe, onReportCrowdedness }: CafeCardProps) {
               key={option.value}
               type="button"
               onClick={() => onReportCrowdedness(cafe, option.value)}
-              className="rounded-xl border border-stone-200 bg-stone-50 px-2 py-2.5 text-xs font-medium text-stone-700 transition-colors hover:border-amber-300 hover:bg-amber-50"
+              disabled={isReporting}
+              className="rounded-xl border border-stone-200 bg-stone-50 px-2 py-2.5 text-xs font-medium text-stone-700 transition-colors hover:border-amber-300 hover:bg-amber-50 disabled:cursor-wait disabled:opacity-50"
               aria-label={`${cafe.name} 현재 혼잡도 ${option.value}로 제보`}
             >
               <span aria-hidden="true">{option.emoji}</span> {option.label}
+              {reportSummary?.total ? (
+                <span className="ml-1 text-stone-400">{reportSummary.counts[option.value]}</span>
+              ) : null}
             </button>
           ))}
         </div>

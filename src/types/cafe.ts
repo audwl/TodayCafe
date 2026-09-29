@@ -3,6 +3,15 @@ export type NoiseLevel = "조용" | "보통" | "시끄러움";
 export type WorkFriendly = "추천" | "가능" | "비추천";
 export type OutletLevel = "많음" | "보통" | "적음";
 
+export interface CrowdReportSummary {
+  cafeId: string;
+  status: Crowdedness | null;
+  confidence: "대기" | "보통" | "높음";
+  total: number;
+  counts: Record<Crowdedness, number>;
+  updatedAt: number | null;
+}
+
 export type FilterType =
   | "전체"
   | "여유"

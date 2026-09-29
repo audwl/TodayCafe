@@ -4,11 +4,28 @@ import { useEffect, useMemo, useState } from "react";
 import { sampleCafes } from "@/data/sampleCafes";
 import { loadCafes, saveCafes } from "@/lib/cafeStorage";
 import { filterCafes } from "@/lib/cafeUtils";
-import { Cafe, Crowdedness, FilterType, NaverPlace } from "@/types/cafe";
+import {
+  Cafe,
+  Crowdedness,
+  CrowdReportSummary,
+  FilterType,
+  NaverPlace,
+} from "@/types/cafe";
 import CafeCard from "./CafeCard";
 import FilterBar from "./FilterBar";
 import HeroSection from "./HeroSection";
 import SuccessToast from "./SuccessToast";
+
+const REPORTER_ID_KEY = "todaycafe:reporter-id:v1";
+
+function getReporterId(): string {
+  const saved = window.localStorage.getItem(REPORTER_ID_KEY);
+  if (saved) return saved;
+
+  const created = window.crypto.randomUUID();
+  window.localStorage.setItem(REPORTER_ID_KEY, created);
+  return created;
+}
 
 export default function CafeList() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,6 +36,8 @@ export default function CafeList() {
   const [places, setPlaces] = useState<NaverPlace[]>([]);
   const [searchError, setSearchError] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [reportSummaries, setReportSummaries] = useState<Record<string, CrowdReportSummary>>({});
+  const [reportingCafeId, setReportingCafeId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadTimer = window.setTimeout(() => {
@@ -33,6 +52,26 @@ export default function CafeList() {
 
     return () => window.clearTimeout(loadTimer);
   }, []);
+
+  useEffect(() => {
+    const cafeIds = cafes.map((cafe) => cafe.id).slice(0, 50);
+    if (!cafeIds.length) return;
+
+    const controller = new AbortController();
+    fetch(`/api/reports?cafeIds=${encodeURIComponent(cafeIds.join(","))}`, {
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const data = (await response.json()) as {
+          summaries?: Record<string, CrowdReportSummary>;
+        };
+        if (data.summaries) setReportSummaries(data.summaries);
+      })
+      .catch(() => undefined);
+
+    return () => controller.abort();
+  }, [cafes]);
 
   const filteredCafes = useMemo(
     () => filterCafes(cafes, activeFilter, searchQuery),
@@ -93,25 +132,44 @@ export default function CafeList() {
     window.setTimeout(() => setShowSuccess(false), 4000);
   };
 
-  const handleQuickReport = (targetCafe: Cafe, crowdedness: Crowdedness) => {
-    const nextCafes = cafes.map((cafe) =>
-      cafe.id === targetCafe.id
-        ? {
-            ...cafe,
-            crowdedness,
-            noise: null,
-            workFriendly: null,
-            outlets: null,
-            lastUpdatedMinutes: 0,
-            statusSource: "community" as const,
-          }
-        : cafe
-    );
-    setCafes(nextCafes);
-    saveCafes(nextCafes);
-    setSuccessMessage(`${targetCafe.name} 상태를 '${crowdedness}'로 반영했어요.`);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 4000);
+  const handleQuickReport = async (targetCafe: Cafe, crowdedness: Crowdedness) => {
+    setReportingCafeId(targetCafe.id);
+    setSearchError("");
+
+    try {
+      const response = await fetch("/api/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cafeId: targetCafe.id,
+          status: crowdedness,
+          reporterId: getReporterId(),
+        }),
+      });
+      const data = (await response.json()) as {
+        summary?: CrowdReportSummary;
+        error?: string;
+      };
+      if (!response.ok || !data.summary) {
+        throw new Error(data.error || "제보를 저장하지 못했습니다.");
+      }
+
+      setReportSummaries((current) => ({
+        ...current,
+        [targetCafe.id]: data.summary!,
+      }));
+      setSuccessMessage(
+        data.summary.total < 3
+          ? `${targetCafe.name} 제보가 접수됐어요. ${3 - data.summary.total}건 더 모이면 상태가 표시돼요.`
+          : `${targetCafe.name} 최근 혼잡도 집계에 반영했어요.`
+      );
+      setShowSuccess(true);
+      window.setTimeout(() => setShowSuccess(false), 4000);
+    } catch (error) {
+      setSearchError(error instanceof Error ? error.message : "제보 중 오류가 발생했습니다.");
+    } finally {
+      setReportingCafeId(null);
+    }
   };
 
   return (
@@ -179,6 +237,8 @@ export default function CafeList() {
               <CafeCard
                 key={cafe.id}
                 cafe={cafe}
+                reportSummary={reportSummaries[cafe.id]}
+                isReporting={reportingCafeId === cafe.id}
                 onReportCrowdedness={handleQuickReport}
               />
             ))}

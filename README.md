@@ -44,6 +44,18 @@ NAVER Cloud Platform의 NAVER API HUB에서 검색 API 이용을 신청하고 Ap
 
 시크릿은 GitHub이나 클라이언트 코드에 저장하지 않습니다.
 
+### 혼잡도 제보 집계
+
+혼잡도 제보는 Cloudflare D1에 카페별·익명 브라우저별 한 표로 저장합니다. 최근 60분의 서로 다른 제보가 3건 이상 모이면 대표 상태를 표시하며, 최근 제보에 더 높은 가중치를 줍니다.
+
+```bash
+npx wrangler d1 create todaycafe-db
+# 출력된 database_id로 wrangler.toml의 [[d1_databases]]를 설정한 뒤
+npx wrangler d1 migrations apply todaycafe-db --remote
+```
+
+브라우저 식별자는 로그인 대용의 임의 UUID이며 개인정보나 IP 주소를 저장하지 않습니다.
+
 로컬에서 한 번 올려 보려면:
 
 ```bash
