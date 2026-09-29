@@ -86,10 +86,18 @@ export default function CafeList() {
     return () => controller.abort();
   }, [cafes]);
 
-  const filteredCafes = useMemo(
-    () => filterCafes(cafes, activeFilter, searchQuery),
-    [activeFilter, cafes, searchQuery]
-  );
+  const filteredCafes = useMemo(() => {
+    const cafesWithLiveCrowds = cafes.map((cafe) => {
+      const summary = reportSummaries[cafe.id];
+      if (!summary?.total) return cafe;
+      return {
+        ...cafe,
+        crowdedness: summary.status,
+      };
+    });
+
+    return filterCafes(cafesWithLiveCrowds, activeFilter, searchQuery);
+  }, [activeFilter, cafes, reportSummaries, searchQuery]);
 
   const handleNaverSearch = async () => {
     const query = searchQuery.trim();

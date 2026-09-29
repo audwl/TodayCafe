@@ -32,11 +32,13 @@ export default function CafeCard({
   const hasStatus = Boolean(
     cafe.crowdedness || cafe.noise || cafe.workFriendly || cafe.outlets
   );
-  const displayedCrowdedness = reportSummary?.status || cafe.crowdedness;
+  const displayedCrowdedness = reportSummary?.total
+    ? reportSummary.status
+    : cafe.crowdedness;
   const reportStatusLabel = reportSummary?.status
-    ? `최근 60분 ${reportSummary.total}명 · 신뢰도 ${reportSummary.confidence}`
+    ? `최근 60분 혼잡도 ${reportSummary.total}명 · 신뢰도 ${reportSummary.confidence}`
     : reportSummary?.total
-      ? `최근 제보 ${reportSummary.total}건 · 3건부터 집계`
+      ? `최근 혼잡도 제보 ${reportSummary.total}건 · 3건부터 집계`
       : cafe.statusSource === "example"
         ? "예시 상태 · 실제와 다를 수 있어요"
         : hasStatus
@@ -120,6 +122,12 @@ export default function CafeCard({
         </div>
       </dl>
 
+      {cafe.statusSource === "example" ? (
+        <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+          소음·카공·콘센트는 화면 체험용 예시예요.
+        </p>
+      ) : null}
+
       <fieldset className="mt-5 border-t border-stone-100 pt-4">
         <legend className="px-1 text-center text-xs font-medium text-stone-500">
           {selectedReport
@@ -139,7 +147,7 @@ export default function CafeCard({
                 type="button"
                 onClick={() => onReportCrowdedness(cafe, option.value)}
                 disabled={Boolean(reportingStatus)}
-                className={`rounded-xl border px-2 py-2.5 text-xs font-medium transition-all disabled:cursor-wait ${
+                className={`rounded-xl border px-2 py-2.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 disabled:cursor-wait ${
                   isSubmitting || isSelected
                     ? "border-amber-500 bg-amber-100 text-amber-950 ring-2 ring-amber-200"
                     : "border-stone-200 bg-stone-50 text-stone-700 hover:border-amber-300 hover:bg-amber-50"
