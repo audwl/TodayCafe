@@ -38,10 +38,3 @@ export interface NaverPlace {
   mapx: string;
   mapy: string;
 }
-
-export interface StatusUpdateForm {
-  crowdedness: Crowdedness;
-  noise: NoiseLevel;
-  workFriendly: boolean;
-  outlets: OutletLevel;
-}

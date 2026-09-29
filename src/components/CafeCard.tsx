@@ -1,4 +1,4 @@
-import { Cafe } from "@/types/cafe";
+import { Cafe, Crowdedness } from "@/types/cafe";
 import {
   formatLastUpdated,
   formatPrice,
@@ -10,10 +10,16 @@ import {
 
 interface CafeCardProps {
   cafe: Cafe;
-  onReportStatus: (cafe: Cafe) => void;
+  onReportCrowdedness: (cafe: Cafe, crowdedness: Crowdedness) => void;
 }
 
-export default function CafeCard({ cafe, onReportStatus }: CafeCardProps) {
+const quickReportOptions: Array<{ value: Crowdedness; label: string; emoji: string }> = [
+  { value: "여유", label: "여유", emoji: "🟢" },
+  { value: "보통", label: "보통", emoji: "🟡" },
+  { value: "혼잡", label: "혼잡", emoji: "🔴" },
+];
+
+export default function CafeCard({ cafe, onReportCrowdedness }: CafeCardProps) {
   const hasStatus = Boolean(
     cafe.crowdedness || cafe.noise || cafe.workFriendly || cafe.outlets
   );
@@ -99,13 +105,24 @@ export default function CafeCard({ cafe, onReportStatus }: CafeCardProps) {
         </div>
       </dl>
 
-      <button
-        type="button"
-        onClick={() => onReportStatus(cafe)}
-        className="mt-5 w-full rounded-xl bg-stone-50 py-2.5 text-sm font-medium text-amber-900 transition-colors hover:bg-amber-50"
-      >
-        지금 상태 알려주기
-      </button>
+      <fieldset className="mt-5 border-t border-stone-100 pt-4">
+        <legend className="px-1 text-center text-xs font-medium text-stone-500">
+          지금 자리 있나요? 한 번만 눌러주세요
+        </legend>
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          {quickReportOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => onReportCrowdedness(cafe, option.value)}
+              className="rounded-xl border border-stone-200 bg-stone-50 px-2 py-2.5 text-xs font-medium text-stone-700 transition-colors hover:border-amber-300 hover:bg-amber-50"
+              aria-label={`${cafe.name} 현재 혼잡도 ${option.value}로 제보`}
+            >
+              <span aria-hidden="true">{option.emoji}</span> {option.label}
+            </button>
+          ))}
+        </div>
+      </fieldset>
     </article>
   );
 }

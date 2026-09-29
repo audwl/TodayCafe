@@ -4,19 +4,18 @@ import { useEffect, useMemo, useState } from "react";
 import { sampleCafes } from "@/data/sampleCafes";
 import { loadCafes, saveCafes } from "@/lib/cafeStorage";
 import { filterCafes } from "@/lib/cafeUtils";
-import { Cafe, FilterType, NaverPlace, StatusUpdateForm } from "@/types/cafe";
+import { Cafe, Crowdedness, FilterType, NaverPlace } from "@/types/cafe";
 import CafeCard from "./CafeCard";
 import FilterBar from "./FilterBar";
 import HeroSection from "./HeroSection";
-import StatusUpdateModal from "./StatusUpdateModal";
 import SuccessToast from "./SuccessToast";
 
 export default function CafeList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("전체");
   const [cafes, setCafes] = useState<Cafe[]>(sampleCafes);
-  const [selectedCafe, setSelectedCafe] = useState<Cafe | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const [places, setPlaces] = useState<NaverPlace[]>([]);
   const [searchError, setSearchError] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -25,6 +24,7 @@ export default function CafeList() {
     const loadTimer = window.setTimeout(() => {
       setCafes(loadCafes());
       if (new URLSearchParams(window.location.search).has("added")) {
+        setSuccessMessage("카페를 내 목록에 저장했어요.");
         setShowSuccess(true);
         window.history.replaceState(null, "", "/#cafe-list");
         window.setTimeout(() => setShowSuccess(false), 4000);
@@ -88,20 +88,20 @@ export default function CafeList() {
     setCafes(nextCafes);
     saveCafes(nextCafes);
     setPlaces((current) => current.filter((item) => item !== place));
+    setSuccessMessage("카페를 내 목록에 저장했어요.");
     setShowSuccess(true);
     window.setTimeout(() => setShowSuccess(false), 4000);
   };
 
-  const handleSubmitStatus = (form: StatusUpdateForm) => {
-    if (!selectedCafe) return;
+  const handleQuickReport = (targetCafe: Cafe, crowdedness: Crowdedness) => {
     const nextCafes = cafes.map((cafe) =>
-      cafe.id === selectedCafe.id
+      cafe.id === targetCafe.id
         ? {
             ...cafe,
-            crowdedness: form.crowdedness,
-            noise: form.noise,
-            workFriendly: form.workFriendly ? "추천" as const : "비추천" as const,
-            outlets: form.outlets,
+            crowdedness,
+            noise: null,
+            workFriendly: null,
+            outlets: null,
             lastUpdatedMinutes: 0,
             statusSource: "community" as const,
           }
@@ -109,7 +109,7 @@ export default function CafeList() {
     );
     setCafes(nextCafes);
     saveCafes(nextCafes);
-    setSelectedCafe(null);
+    setSuccessMessage(`${targetCafe.name} 상태를 '${crowdedness}'로 반영했어요.`);
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 4000);
   };
@@ -179,22 +179,16 @@ export default function CafeList() {
               <CafeCard
                 key={cafe.id}
                 cafe={cafe}
-                onReportStatus={setSelectedCafe}
+                onReportCrowdedness={handleQuickReport}
               />
             ))}
           </div>
         )}
       </section>
 
-      <StatusUpdateModal
-        cafe={selectedCafe}
-        onClose={() => setSelectedCafe(null)}
-        onSubmit={handleSubmitStatus}
-      />
-
       {showSuccess && (
         <SuccessToast
-          message="내 목록에 저장했어요. 이 브라우저에서 계속 확인할 수 있습니다."
+          message={successMessage}
           onClose={() => setShowSuccess(false)}
         />
       )}
